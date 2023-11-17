@@ -13,7 +13,7 @@ def ingresaPedidoFunda(id_usuario):
     estado = st.selectbox("Estado:", [ "Señado", "Pedido", "Avisado", "Entregado", "Cancelado"])
 
     # Botón para registrar el pedido de funda
-    st.button("Registrar Pedido"):
+    st.button("Registrar Pedido")
 
 if __name__ == "__main__":
     ingresaPedidoFunda()
