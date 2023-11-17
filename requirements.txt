@@ -1,3 +1,4 @@
+--upgrade pip
 pandas==2.0.2
 Pillow==9.3.0
 pyodbc==4.0.39
