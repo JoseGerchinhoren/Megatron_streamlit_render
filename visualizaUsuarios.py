@@ -1,110 +1,71 @@
 import streamlit as st
-import pyodbc
 import pandas as pd
 import json
 
-# Cargar configuración desde el archivo config.json
-with open("../config.json") as config_file:
-    config = json.load(config_file)
+# Simular datos de configuración desde el archivo config.json
+config = {
+    "driver": "SimulatedDriver",
+    "server": "SimulatedServer",
+    "database": "SimulatedDatabase",
+    "user": "SimulatedUser",
+    "password": "SimulatedPassword"
+}
 
-# Conexión a la base de datos SQL Server
-db = pyodbc.connect(
-    driver=config["driver"],
-    server=config["server"],
-    database=config["database"],
-    uid=config["user"],
-    pwd=config["password"]
-)
+# Función para simular la obtención de datos de pedidos de fundas
+def obtener_datos_simulados():
+    # Simular datos de pedidos de fundas
+    data = {
+        "ID": [1, 2, 3],
+        "Fecha": ["2023-01-01", "2023-02-01", "2023-03-01"],
+        "Pedido": ["Pedido1", "Pedido2", "Pedido3"],
+        "Nombre del Cliente": ["Cliente1", "Cliente2", "Cliente3"],
+        "Contacto": ["Contacto1", "Contacto2", "Contacto3"],
+        "Estado": ["Avisado", "Entregado", "Señado"],
+        "ID Usuario": [101, 102, 103],
+        "Nombre de Usuario": ["Usuario1", "Usuario2", "Usuario3"],
+    }
 
-def visualizar_usuarios():
-    st.title("Visualizar Usuarios")
+    # Crear un DataFrame simulado
+    df = pd.DataFrame(data)
 
-    # Consulta SQL para obtener la información de los usuarios
-    query_usuarios = "SELECT * FROM Usuarios"
-    usuarios_df = pd.read_sql(query_usuarios, db)
+    return df
 
-    # Cambiar los nombres de las columnas según tus necesidades
-    usuarios_df.columns = ["ID", "Nombre y Apellido", "Correo Electrónico", "Contraseña", "Fecha de Nacimiento", "DNI", "Domicilio",  "Fecha Creacion", "Rol"]
+# Función para simular la edición del estado de un pedido de funda
+def editar_estado_pedido_funda_simulado(pedidos_df, id_pedido_funda, nuevo_estado):
+    # Verificar si el ID del pedido de funda existe en los datos simulados
+    if id_pedido_funda not in pedidos_df['ID'].values:
+        st.warning(f"El ID del Pedido de Funda {id_pedido_funda} no existe.")
+        return
 
-    # Quita columna Contraseña
-    usuarios_df = usuarios_df[[
-        "ID", "Nombre y Apellido", "Correo Electrónico", "Fecha de Nacimiento", "DNI", "Domicilio",  "Fecha Creacion", "Rol"
-    ]]
+    # Actualizar el estado del pedido de funda en los datos simulados
+    pedidos_df.loc[pedidos_df['ID'] == id_pedido_funda, 'Estado'] = nuevo_estado
 
-#idUsuario	nombreApellido	email	contraseña	fechaNacimiento	dni	domicilio	fechaCreacion	rol
+    st.success(f"Estado del Pedido de Funda {id_pedido_funda} editado correctamente a: {nuevo_estado}")
 
-    # Mostrar la tabla de usuarios
-    st.dataframe(usuarios_df)
+# Función principal para la interfaz de usuario
+def visualiza_pedidos_fundas():
+    st.title("Visualizar Pedidos de Fundas")
 
-def editar_usuarios():
-    st.title("Editar Usuarios")
+    # Obtener datos simulados
+    pedidos_df = obtener_datos_simulados()
 
-    # Agregar un campo para ingresar el idUsuario
-    id_usuario_editar = st.text_input("Ingrese el ID del usuario que desea editar:")
+    # Cambiar los nombres de las columnas
+    pedidos_df.columns = ["ID", "Fecha", "Pedido", "Nombre del Cliente", "Contacto", "Estado", "ID Usuario", "Nombre de Usuario"]
 
-    if id_usuario_editar:
-        # Consultar el usuario específico por ID
-        query_usuario = f"SELECT * FROM Usuarios WHERE idUsuario = {id_usuario_editar}"
-        usuario_editar_df = pd.read_sql(query_usuario, db)
+    # Mostrar la tabla de pedidos de fundas
+    st.dataframe(pedidos_df)
 
-        if not usuario_editar_df.empty:
-            # Mostrar la información actual de la venta
-            st.write("Información actual de la venta:")
-            # Cambiar los nombres de las columnas
-            usuario_editar_df.columns = ["ID", "Nombre y Apellido", "Correo Electrónico", "Contraseña", "Fecha de Nacimiento", "DNI", "Domicilio",  "Fecha Creacion", "Rol"]
+    # Sección para la edición del estado de registros simulada
+    st.subheader("Editar Estado")
+    id_pedido_funda = st.number_input("Ingrese el ID del Pedido de Funda que desea editar:", value=0)
+    nuevo_estado = st.selectbox("Nuevo valor del campo estado:", ["Señado", "Pedido", "Avisado", "Entregado", "Cancelado"])
 
-            # Cambiar el orden del DataFrame
-            usuario_editar_df = usuario_editar_df[[
-                "Nombre y Apellido", "Correo Electrónico", "Fecha de Nacimiento", "DNI", "Domicilio", "Rol"
-                ]]
+    if st.button("Guardar"):
+        editar_estado_pedido_funda_simulado(pedidos_df, id_pedido_funda, nuevo_estado)
 
-            st.dataframe(usuario_editar_df)
-
-            # Mostrar campos para editar cada variable
-            for column in usuario_editar_df.columns:
-                nuevo_valor = st.text_input(f"Nuevo valor para {column}", value=usuario_editar_df.iloc[0][column])
-                usuario_editar_df.at[0, column] = nuevo_valor
-
-            # Botón para guardar los cambios
-            if st.button("Guardar cambios"):
-                # Actualizar la venta en la base de datos
-                nueva_informacion = {
-                    "nombreApellido": usuario_editar_df.at[0, "Nombre y Apellido"],
-                    "email": usuario_editar_df.at[0, "Correo Electrónico"],
-                    "fechaNacimiento": usuario_editar_df.at[0, "Fecha de Nacimiento"],
-                    "dni": usuario_editar_df.at[0, "DNI"],
-                    "domicilio": usuario_editar_df.at[0, "Domicilio"],
-                    "rol": usuario_editar_df.at[0, "Rol"]
-                }
-
-                # Generar la sentencia SQL UPDATE
-                update_query = f"""
-                    UPDATE Usuarios
-                    SET
-                        nombreApellido = '{nueva_informacion["nombreApellido"]}',
-                        email = '{nueva_informacion["email"]}',
-                        fechaNacimiento = {nueva_informacion["fechaNacimiento"]},
-                        dni = '{nueva_informacion["dni"]}',
-                        domicilio = {nueva_informacion["domicilio"]}
-                    WHERE idUsuario = {id_usuario_editar}
-                """
-
-                # Ejecutar la sentencia SQL UPDATE
-                cursor = db.cursor()
-                cursor.execute(update_query)
-                db.commit()
-
-                st.success("Usuario actualizado correctamente!")
-
-        else:
-            st.warning(f"No se encontró ningun usuario con el ID {id_usuario_editar}")
-
+# Función principal
 def main():
-    visualizar_usuarios()  # Mostrar sección de visualización de usuarios
-
-    # Verificar si el usuario es admin
-    if st.session_state.user_rol == "admin":
-        editar_usuarios()  # Mostrar sección de edición solo para admin
+    visualiza_pedidos_fundas()
 
 if __name__ == "__main__":
     main()
