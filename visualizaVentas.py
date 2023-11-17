@@ -29,6 +29,8 @@ ventas_df = pd.DataFrame(ventas_data)
 st.session_state.user_rol = "admin"
 
 def visualiza_ventas():
+    global ventas_df  # Declarar ventas_df como global
+
     st.title("Visualizar Ventas")
 
     # Construir la consulta simulada
@@ -53,7 +55,7 @@ def visualiza_ventas():
     for metodo_pago in ventas_df["Metodo de Pago"].unique():
         total_metodo_pago = ventas_df[ventas_df["Metodo de Pago"] == metodo_pago]["Precio"].sum()
         st.write(f"Total en {metodo_pago}: ${total_metodo_pago:}")
-
+        
 def editar_ventas():
     st.title("Editar Ventas")
 

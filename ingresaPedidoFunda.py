@@ -2,7 +2,7 @@ import streamlit as st
 import pyodbc
 import json
 
-def ingresaPedidoFunda(id_usuario):
+def ingresaPedidoFunda():
     st.title("Registrar Pedido de Funda")
 
     # Campos para ingresar los datos del pedido de funda

@@ -3,12 +3,11 @@ import pyodbc
 import json
 from datetime import datetime
 
-def venta(id_usuario):
+def venta():
     st.title("Registrar Venta")
 
     # Campos para ingresar los datos de la venta
-    if st.session_state.user_rol == "admin":
-        fecha = st.date_input("Fecha de la venta:")
+    fecha = st.date_input("Fecha de la venta:")
     producto = st.text_input("Producto vendido:")
     precio = st.text_input("Precio:")
     if precio:

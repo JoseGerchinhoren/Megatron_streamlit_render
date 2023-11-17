@@ -3,7 +3,7 @@ import pyodbc
 import json
 
 
-def ingresa_arreglo_tecnico(idUsuario):
+def ingresa_arreglo_tecnico():
     st.title("Registrar Pedido de Arreglo Técnico")
 
     # Campos para ingresar los datos del arreglo técnico
