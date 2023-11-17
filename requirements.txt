@@ -1,0 +1,4 @@
+pandas==2.0.2
+Pillow==9.3.0
+pyodbc==4.0.39
+streamlit==1.26.0
