@@ -23,7 +23,7 @@ def ingresa_arreglo_tecnico(idUsuario):
     observaciones = st.text_input("Observaciones:")
 
     # Botón para registrar el arreglo técnico
-    st.button("Registrar Arreglo Técnico"):
+    st.button("Registrar Arreglo Técnico")
 
 if __name__ == "__main__":
     ingresa_arreglo_tecnico()
